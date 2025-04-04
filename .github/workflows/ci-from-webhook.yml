@@ -37,13 +37,14 @@ jobs:
           curl -sSLo bw.zip https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
           unzip bw.zip
       
-      - name: Build with build-wrapper
+      - name: Run build with build-wrapper
         working-directory: source-code
         run: |
           mkdir -p build-wrapper-output
           ../build-wrapper-linux-x86/build-wrapper-linux-x86-64 \
             --out-dir build-wrapper-output \
             bash -c "cmake -S . -B build && cmake --build build"
+
 
       - name: Run cppcheck
         run: |
