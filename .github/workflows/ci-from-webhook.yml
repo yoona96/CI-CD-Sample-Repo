@@ -1,4 +1,4 @@
-name: CI via Repository Dispatch
+name: CI via Repository Dispatch (Multi-repo)
 
 on:
   repository_dispatch:
@@ -14,7 +14,7 @@ jobs:
           echo "Repository: ${{ github.event.client_payload.repository }}"
           echo "Commit SHA: ${{ github.event.client_payload.commit_sha }}"
 
-      - name: Clone external repository
+      - name: Clone appropriate repo
         run: |
           git clone https://${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.event.client_payload.repository }} source-code
           cd source-code
@@ -30,14 +30,22 @@ jobs:
           sudo make
           sudo cp lib/*.a /usr/lib
 
-      - name: Build project
+      - name: Build and Test - Dev_sample1
+        if: ${{ github.event.client_payload.repository == 'yoona96/Dev_Sample_Repo' }}
         run: |
+          echo "빌드 중: Dev_Sample_Repo"
           cd source-code
           mkdir -p build && cd build
           cmake ..
           make
+          ctest --output-on-failure
 
-      - name: Run tests
+      - name: Build and Test - Dev_sample2
+        if: ${{ github.event.client_payload.repository == 'yoona96/Dev_sample2' }}
         run: |
-          cd source-code/build
+          echo "🔧 빌드 중: Dev_sample2"
+          cd source-code
+          mkdir -p build && cd build
+          cmake ..
+          make
           ctest --output-on-failure
