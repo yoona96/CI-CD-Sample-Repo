@@ -52,24 +52,6 @@ jobs:
           make
           ctest --output-on-failure
 
-      - name: Set SonarCloud ENV by Repository
-        id: sonar-env
-        run: |
-          REPO="${{ github.event.client_payload.repository }}"
-          echo "💡 입력된 Repo: $REPO"
-          
-          if [ "$REPO" = "yoona96/Dev-Sample-Repo" ]; then
-            echo "SONAR_PROJECT_KEY=yoona96_Dev-Sample-Repo" >> $GITHUB_ENV
-            echo "SONAR_ORGANIZATION=yoona96" >> $GITHUB_ENV
-          elif [ "$REPO" = "yoona96/Dev_sample2" ]; then
-            echo "SONAR_PROJECT_KEY=yoona96_Dev_sample2" >> $GITHUB_ENV
-            echo "SONAR_ORGANIZATION=yoona96" >> $GITHUB_ENV
-          else
-            echo "❗ 예상치 못한 레포: $REPO"
-            exit 1
-          fi
-
-
       - name: Run cppcheck
         run: |
           echo "🔍 cppcheck 실행 중"
@@ -80,6 +62,29 @@ jobs:
           echo "🔍 clang-tidy 실행 중"
           cd source-code
           find . -name '*.cpp' | xargs clang-tidy -p build || true
+          
+      - name: Set SonarCloud ENV by Repository
+        id: sonar-env
+        run: |
+          REPO="${{ github.event.client_payload.repository }}"
+          echo "💡 입력된 Repo: $REPO"
+          
+          if [ "$REPO" = "yoona96/Dev-Sample-Repo" ]; then
+            echo "SONAR_PROJECT_KEY=yoona96_Dev-Sample-Repo"
+          elif [ "$REPO" = "yoona96/Dev_sample2" ]; then
+            echo "SONAR_PROJECT_KEY=yoona96_Dev_sample2"
+          else
+            echo "❗ 예상치 못한 레포: $REPO"
+            exit 1
+          fi
+
+          cat <<EOF > source-code/sonar-project.properties
+sonar.projectKey=$SONAR_PROJECT_KEY
+sonar.organization=yoona96
+sonar.projectName=$SONAR_PROJECT_KEY
+sonar.sources=.
+sonar.cfamily.build-wrapper-output=build
+EOF
 
       - name: Run SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
@@ -87,5 +92,3 @@ jobs:
           projectBaseDir: source-code
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PROJECT_KEY: ${{ env.SONAR_PROJECT_KEY }}
-          SONAR_ORGANIZATION: ${{ env.SONAR_ORGANIZATION }}
