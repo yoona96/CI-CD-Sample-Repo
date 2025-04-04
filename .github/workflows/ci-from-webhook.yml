@@ -70,4 +70,4 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           projectKey: yoona96_CI-CD-Sample-Repo
-          organization: dslabkonkuk
+          organization: yoona96
