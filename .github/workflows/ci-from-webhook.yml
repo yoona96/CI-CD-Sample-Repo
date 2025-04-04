@@ -39,29 +39,8 @@ jobs:
 
       - name: Run build with build-wrapper
         run: |
-          cd source-code
-          mkdir -p build
-          ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir build cmake .. && make
-
-      - name: Build and Test - Dev_Sample_Repo
-        if: ${{ github.event.client_payload.repository == 'yoona96/Dev_Sample_Repo' }}
-        run: |
-          echo "🚧 빌드 중: Dev_Sample_Repo"
-          cd source-code
-          mkdir -p build && cd build
-          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-          make
-          ctest --output-on-failure
-
-      - name: Build and Test - Dev_sample2
-        if: ${{ github.event.client_payload.repository == 'yoona96/Dev_sample2' }}
-        run: |
-          echo "🚧 빌드 중: Dev_sample2"
-          cd source-code
-          mkdir -p build && cd build
-          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-          make
-          ctest --output-on-failure
+          mkdir -p source-code/build
+          ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir source-code/build cmake source-code && make -C source-code/build
 
       - name: Run cppcheck
         run: |
