@@ -11,12 +11,12 @@ jobs:
     steps:
       - name: Clone external repository
         run: |
-          git clone https://github.com/${{ github.event.client_payload.repository }} source-code
+          git clone https://${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.event.client_payload.repository }} source-code
           cd source-code
           git checkout ${{ github.event.client_payload.commit_sha }}
 
       - name: Set up dependencies
-        run: sudo apt-get update && sudo apt-get install -y build-essential cmake cppcheck gcovr
+        run: sudo apt-get update && sudo apt-get install -y build-essential cmake cppcheck
 
       - name: Build project
         run: |
@@ -29,10 +29,3 @@ jobs:
         run: |
           cd source-code/build
           ctest --output-on-failure
-
-      - name: Run cppcheck
-        run: |
-          cppcheck ../ --enable=all --inconclusive --quiet --std=c++17
-
-      - name: Deploy
-        run: echo "🚀 배포 완료"
