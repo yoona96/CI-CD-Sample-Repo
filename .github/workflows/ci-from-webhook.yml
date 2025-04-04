@@ -40,10 +40,10 @@ jobs:
       - name: Run build with build-wrapper
         run: |
           mkdir -p build-wrapper-output
-          ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir build-wrapper-output cmake -S source-code -B source-code/build
-          ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir build-wrapper-output make -C source-code/build
-          ctest --test-dir source-code/build --output-on-failure
-
+          cd source-code
+          ../build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir ../build-wrapper-output cmake -S . -B build
+          ../build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir ../build-wrapper-output make -C build
+          ctest --test-dir build --output-on-failure
 
       - name: Run cppcheck
         run: |
