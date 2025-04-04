@@ -42,12 +42,11 @@ jobs:
           unzip bw.zip
                   
       - name: Run build with build-wrapper
-        working-directory: source-code
         run: |
           mkdir -p build-wrapper-output
-          ../build-wrapper-linux-x86/build-wrapper-linux-x86-64 \
+          ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 \
             --out-dir build-wrapper-output \
-            bash -c "cmake -S . -B build && cmake --build build"
+            cmake -Ssource-code -Bsource-code/build && cmake --build source-code/build
 
       - name: Check build-wrapper output
         run: |
@@ -80,11 +79,10 @@ jobs:
       - name: Run SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
-          projectBaseDir: source-code
           args: >
             -Dsonar.projectKey=yoona96_Dev-Sample-Repo
             -Dsonar.organization=yoona96
-            -Dsonar.sources=.
+            -Dsonar.sources=source-code
             -Dsonar.cfamily.compile-commands=build-wrapper-output/compile_commands.json
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
