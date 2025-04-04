@@ -16,9 +16,13 @@ jobs:
 
       - name: Clone appropriate repo
         run: |
-          git clone https://${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.event.client_payload.repository }} source-code
-          cd source-code
-          git checkout ${{ github.event.client_payload.commit_sha }}
+          git clone https://${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.event.client_payload.repository }} repo-temp
+          mv repo-temp source-code
+
+      - name: Debug CMakeLists
+        run: |
+          echo "📂 source-code 폴더 목록"
+          ls -al source-code
 
       - name: Set up dependencies
         run: |
