@@ -69,5 +69,5 @@ jobs:
           projectBaseDir: source-code
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          projectKey: yoona96_CI-CD-Sample-Repo
-          organization: yoona96
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+          SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
