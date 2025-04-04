@@ -50,7 +50,7 @@ jobs:
 
       - name: Check build-wrapper output
         run: |
-          ls -al source-code/build-wrapper-output
+          ls -al build-wrapper-output
       
       - name: Debug build artifacts
         run: |
