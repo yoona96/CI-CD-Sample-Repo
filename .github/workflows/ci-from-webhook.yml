@@ -17,7 +17,8 @@ jobs:
       - name: Clone appropriate repo
         run: |
           git clone https://${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.event.client_payload.repository }} repo-temp
-          mv repo-temp source-code
+          mv repo-temp/source-code ./source-code
+
 
       - name: Debug CMakeLists
         run: |
