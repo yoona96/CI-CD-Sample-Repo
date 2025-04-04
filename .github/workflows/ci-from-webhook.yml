@@ -59,11 +59,11 @@ jobs:
           echo "💡 입력된 Repo: $REPO"
           
           if [ "$REPO" = "yoona96/Dev-Sample-Repo" ]; then
-            echo "SONAR_PROJECT_KEY=yoona96_Dev-Sample-Repo" >> $GITHUB_OUTPUT
-            echo "SONAR_ORGANIZATION=yoona96" >> $GITHUB_OUTPUT
+            echo "SONAR_PROJECT_KEY=yoona96_Dev-Sample-Repo" >> $GITHUB_ENV
+            echo "SONAR_ORGANIZATION=yoona96" >> $GITHUB_ENV
           elif [ "$REPO" = "yoona96/Dev_sample2" ]; then
-            echo "SONAR_PROJECT_KEY=yoona96_Dev_sample2" >> $GITHUB_OUTPUT
-            echo "SONAR_ORGANIZATION=yoona96" >> $GITHUB_OUTPUT
+            echo "SONAR_PROJECT_KEY=yoona96_Dev_sample2" >> $GITHUB_ENV
+            echo "SONAR_ORGANIZATION=yoona96" >> $GITHUB_ENV
           else
             echo "❗ 예상치 못한 레포: $REPO"
             exit 1
@@ -87,5 +87,5 @@ jobs:
           projectBaseDir: source-code
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PROJECT_KEY: ${{ steps.sonar-env.outputs.SONAR_PROJECT_KEY }}
-          SONAR_ORGANIZATION: ${{ steps.sonar-env.outputs.SONAR_ORGANIZATION }}
+          SONAR_PROJECT_KEY: ${{ env.SONAR_PROJECT_KEY }}
+          SONAR_ORGANIZATION: ${{ env.SONAR_ORGANIZATION }}
