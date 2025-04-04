@@ -80,11 +80,11 @@ jobs:
       - name: Run SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
-          projectBaseDir: source-code
+          projectBaseDir: .
           args: >
             -Dsonar.projectKey=yoona96_Dev-Sample-Repo
             -Dsonar.organization=yoona96
-            -Dsonar.sources=.
-            -Dsonar.cfamily.build-wrapper-output=../build-wrapper-output
+            -Dsonar.sources=source-code
+            -Dsonar.cfamily.build-wrapper-output=build-wrapper-output
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
