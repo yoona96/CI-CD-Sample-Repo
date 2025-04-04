@@ -19,7 +19,6 @@ jobs:
           git clone https://${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.event.client_payload.repository }} repo-temp
           mv repo-temp/source-code ./source-code
 
-
       - name: Debug CMakeLists
         run: |
           echo "📂 source-code 폴더 목록"
@@ -51,6 +50,11 @@ jobs:
       - name: Check build-wrapper output
         run: |
           ls -al source-code/build-wrapper-output
+      
+      - name: Debug build artifacts
+        run: |
+          echo "📁 빌드 파일 확인"
+          find source-code/build -type f
 
       - name: Run cppcheck
         run: |
@@ -68,7 +72,7 @@ jobs:
         run: |
           echo "sonar.projectKey=yoona96_Dev-Sample-Repo" > sonar-project.properties
           echo "sonar.organization=yoona96" >> sonar-project.properties
-          echo "sonar.sources=." >> sonar-project.properties
+          echo "sonar.sources=src,include" >> sonar-project.properties
           echo "sonar.cfamily.build-wrapper-output=source-code/build-wrapper-output" >> sonar-project.properties
       
       - name: Run SonarCloud Scan
