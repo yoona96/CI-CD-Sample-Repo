@@ -86,6 +86,6 @@ jobs:
             -Dsonar.projectKey=yoona96_Dev-Sample-Repo
             -Dsonar.organization=yoona96
             -Dsonar.sources=.
-            -Dsonar.cfamily.build-wrapper-output=build-wrapper-output  # ✅ 수정된 부분
+            -Dsonar.cfamily.build-wrapper-output=build-wrapper-output
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
