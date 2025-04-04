@@ -50,9 +50,8 @@ jobs:
             cmake -S. -Bbuild && cmake --build build
 
       - name: Check build-wrapper output
-        working-directory: source-code
         run: |
-          ls -al build-wrapper-output
+          ls -al source-code/../build-wrapper-output
       
       - name: Debug build artifacts
         run: |
