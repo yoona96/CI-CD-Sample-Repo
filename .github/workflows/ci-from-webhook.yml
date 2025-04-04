@@ -50,6 +50,9 @@ jobs:
             cmake -S source-code -B source-code/build
           cmake --build source-code/build
 
+      - name: Check build-wrapper output
+        run: |
+          ls -al source-code/build-wrapper-output
 
       - name: Run cppcheck
         run: |
