@@ -62,3 +62,4 @@ jobs:
           projectBaseDir: source-code
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
