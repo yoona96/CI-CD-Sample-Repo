@@ -1,4 +1,4 @@
-name: CI via Repository Dispatch (Multi-repo)
+name: CI via Repository Dispatch (Multi-repo + Static Analysis)
 
 on:
   repository_dispatch:
@@ -11,8 +11,8 @@ jobs:
     steps:
       - name: Print incoming info
         run: |
-          echo "Repository: ${{ github.event.client_payload.repository }}"
-          echo "Commit SHA: ${{ github.event.client_payload.commit_sha }}"
+          echo "🔗 Repository: ${{ github.event.client_payload.repository }}"
+          echo "🔀 Commit SHA: ${{ github.event.client_payload.commit_sha }}"
 
       - name: Clone appropriate repo
         run: |
@@ -21,7 +21,9 @@ jobs:
           git checkout ${{ github.event.client_payload.commit_sha }}
 
       - name: Set up dependencies
-        run: sudo apt-get update && sudo apt-get install -y build-essential cmake cppcheck libgtest-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake cppcheck clang-tidy libgtest-dev gcovr
 
       - name: Install Google Test
         run: |
@@ -33,19 +35,39 @@ jobs:
       - name: Build and Test - Dev_Sample_Repo
         if: ${{ github.event.client_payload.repository == 'yoona96/Dev_Sample_Repo' }}
         run: |
-          echo "빌드 중: Dev_Sample_Repo"
+          echo "🚧 빌드 중: Dev_Sample_Repo"
           cd source-code
           mkdir -p build && cd build
-          cmake ..
+          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
           make
           ctest --output-on-failure
 
       - name: Build and Test - Dev_sample2
         if: ${{ github.event.client_payload.repository == 'yoona96/Dev_sample2' }}
         run: |
-          echo "빌드 중: Dev_sample2"
+          echo "🚧 빌드 중: Dev_sample2"
           cd source-code
           mkdir -p build && cd build
-          cmake ..
+          cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
           make
           ctest --output-on-failure
+
+      - name: Run cppcheck
+        run: |
+          echo "🔍 cppcheck 실행 중"
+          cppcheck source-code --enable=all --inconclusive --quiet --std=c++17 --suppress=missingIncludeSystem
+
+      - name: Run clang-tidy
+        run: |
+          echo "🔍 clang-tidy 실행 중"
+          cd source-code
+          find . -name '*.cpp' | xargs clang-tidy -p build || true
+
+      - name: Run SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        with:
+          projectBaseDir: source-code
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+          SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
