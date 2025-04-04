@@ -32,6 +32,17 @@ jobs:
           sudo make
           sudo cp lib/*.a /usr/lib
 
+      - name: Download build-wrapper
+        run: |
+          curl -sSLo bw.zip https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
+          unzip bw.zip
+
+      - name: Run build with build-wrapper
+        run: |
+          cd source-code
+          mkdir -p build
+          ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir build cmake .. && make
+
       - name: Build and Test - Dev_Sample_Repo
         if: ${{ github.event.client_payload.repository == 'yoona96/Dev_Sample_Repo' }}
         run: |
