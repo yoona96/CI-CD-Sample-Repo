@@ -3,6 +3,14 @@ name: CI from External Webhook
 on:
   repository_dispatch:
     types: [trigger-ci]
+  workflow_dispatch:
+    inputs:
+      repo_url:
+        description: 'https://github.com/yoona96/Dev-Sample-Repo.git'
+        required: true
+      commit_sha:
+        description: 'Optional commit SHA to checkout'
+        required: false
 
 jobs:
   external-ci:
