@@ -52,6 +52,24 @@ jobs:
           make
           ctest --output-on-failure
 
+      - name: Set SonarCloud ENV by Repository
+        id: sonar-env
+        run: |
+          REPO="${{ github.event.client_payload.repository }}"
+          echo "💡 입력된 Repo: $REPO"
+          
+          if [ "$REPO" = "yoona96/Dev_Sample_Repo" ]; then
+            echo "SONAR_PROJECT_KEY=yoona96_Dev_Sample_Repo" >> $GITHUB_OUTPUT
+            echo "SONAR_ORGANIZATION=yoona96" >> $GITHUB_OUTPUT
+          elif [ "$REPO" = "yoona96/Dev_sample2" ]; then
+            echo "SONAR_PROJECT_KEY=yoona96_Dev_sample2" >> $GITHUB_OUTPUT
+            echo "SONAR_ORGANIZATION=yoona96" >> $GITHUB_OUTPUT
+          else
+            echo "❗ 예상치 못한 레포: $REPO"
+            exit 1
+          fi
+
+
       - name: Run cppcheck
         run: |
           echo "🔍 cppcheck 실행 중"
@@ -69,5 +87,5 @@ jobs:
           projectBaseDir: source-code
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
-          SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
+          SONAR_PROJECT_KEY: ${{ steps.sonar-env.outputs.SONAR_PROJECT_KEY }}
+          SONAR_ORGANIZATION: ${{ steps.sonar-env.outputs.SONAR_ORGANIZATION }}
