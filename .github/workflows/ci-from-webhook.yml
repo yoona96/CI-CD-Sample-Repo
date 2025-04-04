@@ -69,17 +69,22 @@ jobs:
           cd source-code
           find . -name '*.cpp' | xargs clang-tidy -p build || true
           
-      - name: Generate sonar-project.properties
-        working-directory: source-code
-        run: |
-          echo "sonar.projectKey=yoona96_Dev-Sample-Repo" > sonar-project.properties
-          echo "sonar.organization=yoona96" >> sonar-project.properties
-          echo "sonar.sources=." >> sonar-project.properties
-          echo "sonar.cfamily.compile-commands=build-wrapper-output/compile_commands.json" >> sonar-project.properties
+#      - name: Generate sonar-project.properties
+#        working-directory: source-code
+#        run: |
+#          echo "sonar.projectKey=yoona96_Dev-Sample-Repo" > sonar-project.properties
+#          echo "sonar.organization=yoona96" >> sonar-project.properties
+#          echo "sonar.sources=." >> sonar-project.properties
+#          echo "sonar.cfamily.compile-commands=build-wrapper-output/compile_commands.json" >> sonar-project.properties
       
       - name: Run SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
           projectBaseDir: source-code
+          args: >
+            -Dsonar.projectKey=yoona96_Dev-Sample-Repo
+            -Dsonar.organization=yoona96
+            -Dsonar.sources=.
+            -Dsonar.cfamily.compile-commands=build-wrapper-output/compile_commands.json
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
