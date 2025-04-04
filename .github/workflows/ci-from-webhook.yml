@@ -42,7 +42,9 @@ jobs:
           mkdir -p source-code/build-wrapper-output
           ./build-wrapper-linux-x86/build-wrapper-linux-x86-64 \
             --out-dir source-code/build-wrapper-output \
-            cmake -S source-code -B source-code/build && cmake --build source-code/build
+            cmake -S source-code -B source-code/build
+          cmake --build source-code/build
+
 
       - name: Run cppcheck
         run: |
