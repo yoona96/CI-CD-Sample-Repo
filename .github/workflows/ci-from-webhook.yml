@@ -9,6 +9,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Print incoming info
+        run: |
+          echo "Repository: ${{ github.event.client_payload.repository }}"
+          echo "Commit SHA: ${{ github.event.client_payload.commit_sha }}"
+
       - name: Clone external repository
         run: |
           git clone https://${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.event.client_payload.repository }} source-code
@@ -16,12 +21,10 @@ jobs:
           git checkout ${{ github.event.client_payload.commit_sha }}
 
       - name: Set up dependencies
-        run: sudo apt-get update && sudo apt-get install -y build-essential cmake cppcheck
+        run: sudo apt-get update && sudo apt-get install -y build-essential cmake cppcheck libgtest-dev
 
       - name: Install Google Test
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libgtest-dev
           cd /usr/src/gtest
           sudo cmake .
           sudo make
@@ -38,5 +41,3 @@ jobs:
         run: |
           cd source-code/build
           ctest --output-on-failure
-
-          
