@@ -43,7 +43,8 @@ jobs:
           mkdir -p build-wrapper-output
           ../build-wrapper-linux-x86/build-wrapper-linux-x86-64 \
             --out-dir build-wrapper-output \
-            cmake -Bbuild -H. && cmake --build build
+            cmake -S . -B build
+          cmake --build build
 
       - name: Run cppcheck
         run: |
