@@ -71,8 +71,10 @@ jobs:
           
           if [ "$REPO" = "yoona96/Dev-Sample-Repo" ]; then
             echo "SONAR_PROJECT_KEY=yoona96_Dev-Sample-Repo"
+            echo "SONAR_ORGANIZATION=yoona96"
           elif [ "$REPO" = "yoona96/Dev_sample2" ]; then
             echo "SONAR_PROJECT_KEY=yoona96_Dev_sample2"
+            echo "SONAR_ORGANIZATION=yoona96"
           else
             echo "❗ 예상치 못한 레포: $REPO"
             exit 1
@@ -80,7 +82,7 @@ jobs:
 
           cat <<EOF > source-code/sonar-project.properties
 sonar.projectKey=$SONAR_PROJECT_KEY
-sonar.organization=yoona96
+sonar.organization=$SONAR_ORGANIZATION
 sonar.projectName=$SONAR_PROJECT_KEY
 sonar.sources=.
 sonar.cfamily.build-wrapper-output=build
