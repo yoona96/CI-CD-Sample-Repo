@@ -24,10 +24,11 @@ jobs:
         run: |
           echo "📂 source-code 폴더 목록"
           ls -al source-code
-
+      
       - name: Set up dependencies
         run: |
           sudo apt-get update
+          sudo apt-get remove -y gcovr
           sudo apt-get install -y build-essential cmake cppcheck clang-tidy libgtest-dev python3-pip jq
           pip install --upgrade gcovr
           sudo snap install gh --classic
