@@ -61,10 +61,11 @@ jobs:
           make VERBOSE=1
           ctest --output-on-failure || true
 
-      - name: Check which gcovr is used
+      - name: Force remove all gcovr traces
         run: |
-          which gcovr
-          gcovr --version
+          pip uninstall -y gcovr || true
+          rm -rf ~/.local/lib/python3.12/site-packages/gcovr*
+          rm -f ~/.local/bin/gcovr
 
       - name: Reinstall clean gcovr
         run: |
@@ -72,6 +73,9 @@ jobs:
           rm -rf ~/.cache/pip
           pip install gcovr==8.3
           ~/.local/bin/gcovr --version
+
+      - name: Sanity check gcovr help
+        run: ~/.local/bin/gcovr --help | grep xml-version || echo "❌ xml-version 옵션 없음"
 
       - name: Generate coverage report (gcovr)
         run: |
