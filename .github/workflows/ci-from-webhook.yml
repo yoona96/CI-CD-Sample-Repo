@@ -35,13 +35,6 @@ jobs:
           echo "✅ gcovr version:"
           ~/.local/bin/gcovr --version
 
-      - name: Check gcovr installation
-        run: |
-          if ! ~/.local/bin/gcovr --version | grep -q "7."; then
-            echo "❌ 최신 gcovr 설치 실패. 빌드 중단!"
-            exit 1
-          fi
-
       - name: Install Google Test
         run: |
           cd /usr/src/gtest
@@ -67,6 +60,11 @@ jobs:
           cd build
           make VERBOSE=1
           ctest --output-on-failure || true
+
+      - name: Check which gcovr is used
+        run: |
+          which gcovr
+          gcovr --version
 
       - name: Generate coverage report (gcovr)
         run: |
