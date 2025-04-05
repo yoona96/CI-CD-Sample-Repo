@@ -47,7 +47,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ../source-code
+          cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../source-code
           ls -al   # Makefile 생성됐는지 확인
           ../build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir ../bw-output make VERBOSE=1
       
@@ -70,6 +70,10 @@ jobs:
         run: cat cppcheck-report.txt
 
 
+      - name: Link compile_commands.json
+        run: |
+          ln -s $(pwd)/build/compile_commands.json source-code/compile_commands.json
+          
       - name: Run clang-tidy (with output)
         run: |
           echo "🔍 clang-tidy 실행 중"
@@ -102,11 +106,19 @@ jobs:
           sonar-scanner/bin/sonar-scanner \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
-      - name: Fetch SonarCloud issues (BLOCKER + CRITICAL)
+      - name: Fetch all SonarCloud issues (bugs, vulnerabilities, code smells)
         run: |
           curl -s -u ${{ secrets.SONAR_TOKEN }}: \
-            "https://sonarcloud.io/api/issues/search?projectKeys=yoona96_Dev-Sample-Repo&severities=BLOCKER,CRITICAL&resolved=false" \
+            "https://sonarcloud.io/api/issues/search?projectKeys=yoona96_Dev-Sample-Repo&resolved=false&pageSize=500" \
             -o sonar-issues.json
+
+      - name: Print all SonarCloud issues to console
+        run: |
+          echo "📋 SonarCloud 이슈 목록 (모든 심각도, 모든 유형)"
+          jq -r '
+            .issues[] |
+            "[\(.severity)] [\(.type)] \(.message)\n  ↪ File: \(.component | sub(".*src/"; "")) | Line: \(.line // "N/A") | Key: \(.key)\n"
+          ' sonar-issues.json
 
       - name: Create GitHub issues
         env:
