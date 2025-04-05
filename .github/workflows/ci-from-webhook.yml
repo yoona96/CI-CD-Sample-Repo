@@ -40,17 +40,14 @@ jobs:
         run: |
           curl -sSLo build-wrapper-linux-x86.zip https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
           unzip build-wrapper-linux-x86.zip
-
+  
       - name: Build inside build-wrapper
         run: |
           mkdir build
           cd build
           cmake ../source-code
-          ../build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir ../bw-output make
-
-      - name: Check build-wrapper output
-        run: |
-          ls -al source-code/../build-wrapper-output
+          ls -al   # Makefile 생성됐는지 확인
+          ../build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir ../bw-output make VERBOSE=1
       
       - name: Debug build artifacts
         run: |
