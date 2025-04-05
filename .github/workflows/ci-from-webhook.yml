@@ -63,7 +63,7 @@ jobs:
           mkdir -p coverage
           gcovr -r source-code \
                 --exclude source-code/test \
-                --cobertura-pretty \
+                --xml \
                 -o coverage/coverage.xml
 
       - name: Show coverage report summary
