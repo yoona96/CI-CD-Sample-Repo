@@ -105,12 +105,37 @@ jobs:
         run: |
           sonar-scanner/bin/sonar-scanner \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
-
-      - name: Fetch all SonarCloud issues (bugs, vulnerabilities, code smells)
+            
+      - name: Fetch SonarCloud issues (all types)
         run: |
           curl -s -u ${{ secrets.SONAR_TOKEN }}: \
             "https://sonarcloud.io/api/issues/search?projectKeys=yoona96_Dev-Sample-Repo&resolved=false&pageSize=500" \
             -o sonar-issues.json
+
+      - name: Create consolidated GitHub issue with Markdown table
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "📄 이슈 테이블 생성 중..."
+          
+          echo "| 유형 | 심각도 | 파일 | 라인 | 설명 |" > issue-body.md
+          echo "|------|--------|------|------|------|" >> issue-body.md
+
+          jq -r '
+            .issues[] |
+            "| \(.type) | \(.severity) | \(.component | sub(".*src/"; "")) | \(.line // "N/A") | \(.message | gsub("[\r\n]"; " ")) |"
+          ' sonar-issues.json >> issue-body.md
+
+          issue_count=$(cat issue-body.md | wc -l)
+          echo "🔢 총 이슈 수: $((issue_count - 2))"
+
+          if [[ $issue_count -gt 2 ]]; then
+            gh issue create \
+              --title "📊 SonarCloud 정적 분석 요약 보고서" \
+              --body "$(cat issue-body.md)"
+          else
+            echo "✅ 이슈가 없으므로 생성하지 않습니다."
+          fi
 
       - name: Print all SonarCloud issues to console
         run: |
@@ -119,27 +144,3 @@ jobs:
             .issues[] |
             "[\(.severity)] [\(.type)] \(.message)\n  ↪ File: \(.component | sub(".*src/"; "")) | Line: \(.line // "N/A") | Key: \(.key)\n"
           ' sonar-issues.json
-
-      - name: Create GitHub issues
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          count=0
-          jq -c '.issues[]' sonar-issues.json | while read -r issue; do
-            key=$(echo "$issue" | jq -r '.key')
-            severity=$(echo "$issue" | jq -r '.severity')
-            type=$(echo "$issue" | jq -r '.type')
-            message=$(echo "$issue" | jq -r '.message')
-            file=$(echo "$issue" | jq -r '.component' | sed 's/.*src\///')
-            line=$(echo "$issue" | jq -r '.line // "?"')
-            title="[SonarCloud][${severity}] $message"
-            body="**파일**: \`$file\`\n**라인**: $line\n**유형**: $type\n\nSonarCloud Issue Key: \`$key\`"
-
-            # 중복 방지를 위해 제목에 키워드 포함 여부 확인
-            existing=$(gh issue list --search "$key" --limit 1 --json title | jq length)
-            if [[ "$existing" -eq 0 ]]; then
-              gh issue create --title "$title" --body "$body"
-              count=$((count + 1))
-            fi
-          done
-          echo "총 생성된 이슈 수: $count"
