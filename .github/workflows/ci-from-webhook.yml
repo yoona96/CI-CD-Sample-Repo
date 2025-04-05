@@ -75,6 +75,12 @@ jobs:
           unzip sonar-scanner.zip
           mv sonar-scanner-* sonar-scanner
   
+      - name: Confirm properties file is where expected
+        run: |
+          echo "🔍 Looking for sonar-project.properties..."
+          ls -al dev-source/
+          cat dev-source/sonar-project.properties
+
       - name: Run SonarCloud scanner manually
         run: |
           sonar-scanner/bin/sonar-scanner \
