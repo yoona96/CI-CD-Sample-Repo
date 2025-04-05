@@ -70,12 +70,20 @@ jobs:
         run: cat cppcheck-report.txt
 
 
-      - name: Run clang-tidy
+      - name: Run clang-tidy (with output)
         run: |
           echo "🔍 clang-tidy 실행 중"
-          cd source-code
-          find . -name '*.cpp' | xargs clang-tidy -p build || true
-  
+          mkdir -p clang-tidy-report
+          find source-code -name '*.cpp' | while read file; do
+            echo "🧩 검사 중: $file"
+            clang-tidy "$file" -p build >> clang-tidy-report/report.txt 2>&1 || true
+          done
+
+      - name: Show clang-tidy results
+        run: |
+          echo "📄 clang-tidy 분석 결과:"
+          cat clang-tidy-report/report.txt || echo "❌ 결과 없음"
+
 
       - name: Download sonar-scanner
         run: |
