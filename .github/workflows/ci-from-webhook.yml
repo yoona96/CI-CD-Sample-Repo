@@ -68,19 +68,15 @@ jobs:
           echo "🔍 clang-tidy 실행 중"
           cd source-code
           find . -name '*.cpp' | xargs clang-tidy -p build || true
-          
-#      - name: Generate sonar-project.properties
-#        working-directory: source-code
-#        run: |
-#          echo "sonar.projectKey=yoona96_Dev-Sample-Repo" > sonar-project.properties
-#          echo "sonar.organization=yoona96" >> sonar-project.properties
-#          echo "sonar.sources=." >> sonar-project.properties
-#          echo "sonar.cfamily.compile-commands=build-wrapper-output/compile_commands.json" >> sonar-project.properties
-      
-      - name: Run SonarCloud analysis
-        uses: SonarSource/sonarcloud-github-action@v2
-        with:
-          organization: ${{ secrets.SONAR_ORG }}
-          projectKey: ${{ secrets.SONAR_PROJECT_KEY }}
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+      - name: Download sonar-scanner
+        run: |
+          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+          unzip sonar-scanner.zip
+          mv sonar-scanner-* sonar-scanner
+  
+      - name: Run SonarCloud scanner manually
+        run: |
+          sonar-scanner/bin/sonar-scanner \
+            -Dproject.settings=dev-source/sonar-project.properties \
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
