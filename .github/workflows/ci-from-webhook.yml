@@ -50,6 +50,25 @@ jobs:
           cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../source-code
           ls -al   # Makefile 생성됐는지 확인
           ../build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir ../bw-output make VERBOSE=1
+
+      - name: Build & Run Tests with Coverage
+        run: |
+          cd build
+          make VERBOSE=1
+          ctest --output-on-failure || true
+
+      - name: Generate coverage report (gcovr)
+        run: |
+          mkdir -p coverage
+          gcovr -r source-code \
+                --exclude source-code/test \
+                --xml -o coverage/coverage.xml \
+                --gcov-executable=gcov
+
+      - name: Show coverage report summary
+        run: |
+          echo "📈 coverage.xml 생성 결과:"
+          head -n 20 coverage/coverage.xml || echo "❌ coverage.xml 없음"
       
       - name: Debug build artifacts and build-wrapper output
         run: |
