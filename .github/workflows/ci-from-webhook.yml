@@ -124,7 +124,8 @@ jobs:
       - name: Run SonarCloud scanner manually
         run: |
           sonar-scanner/bin/sonar-scanner \
-            -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+            -Dsonar.coverageReportPaths=coverage/coverage.xml
             
       - name: Fetch SonarCloud issues (all types)
         run: |
