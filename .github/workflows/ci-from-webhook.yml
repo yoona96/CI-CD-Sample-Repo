@@ -28,12 +28,8 @@ jobs:
       - name: Set up dependencies
         run: |
           sudo apt-get update
-          sudo apt-get remove -y gcovr  # 🔥 반드시 삭제
           sudo apt-get install -y build-essential cmake cppcheck clang-tidy libgtest-dev python3-pip jq
-          pip install --upgrade gcovr
           sudo snap install gh --classic
-          echo "✅ gcovr version:"
-          ~/.local/bin/gcovr --version
 
       - name: Install Google Test
         run: |
@@ -61,21 +57,15 @@ jobs:
           make VERBOSE=1
           ctest --output-on-failure || true
 
-      - name: Force remove all gcovr traces
+      - name: Install gcovr from GitHub source (최신)
         run: |
           pip uninstall -y gcovr || true
-          rm -rf ~/.local/lib/python3.12/site-packages/gcovr*
-          rm -f ~/.local/bin/gcovr
-
-      - name: Reinstall clean gcovr
-        run: |
-          pip uninstall -y gcovr
-          rm -rf ~/.cache/pip
-          pip install gcovr==8.3
+          rm -rf ~/.local/lib/python3.12/site-packages/gcovr* ~/.local/bin/gcovr
+          git clone https://github.com/gcovr/gcovr.git
+          cd gcovr
+          pip install .
           ~/.local/bin/gcovr --version
-
-      - name: Sanity check gcovr help
-        run: ~/.local/bin/gcovr --help | grep xml-version || echo "❌ xml-version 옵션 없음"
+          ~/.local/bin/gcovr --help | grep xml-version || echo "❌ xml-version 옵션 없음"음"
 
       - name: Generate coverage report (gcovr)
         run: |
