@@ -49,10 +49,14 @@ jobs:
           ls -al   # Makefile 생성됐는지 확인
           ../build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir ../bw-output make VERBOSE=1
       
-      - name: Debug build artifacts
+      - name: Debug build artifacts and build-wrapper output
         run: |
-          echo "📁 빌드 파일 확인"
-          find build -type f
+          echo "📁 build 디렉토리 파일 목록"
+          find build -type f || echo "build 디렉토리 없음"
+      
+          echo "📁 bw-output 디렉토리 확인"
+          find bw-output -type f || echo "bw-output 디렉토리 없음"
+
 
       - name: Run cppcheck
         run: |
