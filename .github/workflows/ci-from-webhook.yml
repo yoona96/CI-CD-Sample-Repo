@@ -52,7 +52,7 @@ jobs:
       - name: Debug build artifacts
         run: |
           echo "📁 빌드 파일 확인"
-          find source-code/build -type f
+          find build -type f
 
       - name: Run cppcheck
         run: |
