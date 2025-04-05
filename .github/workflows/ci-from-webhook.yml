@@ -45,7 +45,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ..
+          cmake ../source-code
           ../build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir ../bw-output make
 
       - name: Check build-wrapper output
