@@ -18,6 +18,8 @@ jobs:
         run: |
           git clone https://${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.event.client_payload.repository }} repo-temp
           mv repo-temp/source-code ./source-code
+          mv repo-temp/sonar-project.properties ./sonar-project.properties
+
 
       - name: Debug CMakeLists
         run: |
@@ -56,7 +58,6 @@ jobs:
       
           echo "📁 bw-output 디렉토리 확인"
           find bw-output -type f || echo "bw-output 디렉토리 없음"
-
 
       - name: Run cppcheck
         run: |
