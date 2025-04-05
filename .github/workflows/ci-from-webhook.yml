@@ -47,7 +47,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../source-code
+          cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_FLAGS="--coverage -O0" ../source-code
           ls -al   # Makefile 생성됐는지 확인
           ../build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir ../bw-output make VERBOSE=1
 
@@ -62,8 +62,9 @@ jobs:
           mkdir -p coverage
           gcovr -r source-code \
                 --exclude source-code/test \
-                --xml -o coverage/coverage.xml \
-                --gcov-executable=gcov
+                --xml-pretty --xml-version=1 \
+                -o coverage/coverage.xml
+
 
       - name: Show coverage report summary
         run: |
