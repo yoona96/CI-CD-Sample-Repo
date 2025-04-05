@@ -28,10 +28,19 @@ jobs:
       - name: Set up dependencies
         run: |
           sudo apt-get update
-          sudo apt-get remove -y gcovr
+          sudo apt-get remove -y gcovr  # 🔥 반드시 삭제
           sudo apt-get install -y build-essential cmake cppcheck clang-tidy libgtest-dev python3-pip jq
           pip install --upgrade gcovr
           sudo snap install gh --classic
+          echo "✅ gcovr version:"
+          ~/.local/bin/gcovr --version
+
+      - name: Check gcovr installation
+        run: |
+          if ! ~/.local/bin/gcovr --version | grep -q "7."; then
+            echo "❌ 최신 gcovr 설치 실패. 빌드 중단!"
+            exit 1
+          fi
 
       - name: Install Google Test
         run: |
@@ -62,7 +71,7 @@ jobs:
       - name: Generate coverage report (gcovr)
         run: |
           mkdir -p coverage
-          gcovr -r source-code \
+          ~/.local/bin/gcovr -r source-code \
                 --exclude source-code/test \
                 --xml-pretty --xml-version=1 \
                 -o coverage/coverage.xml
