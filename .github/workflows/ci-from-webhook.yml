@@ -35,19 +35,18 @@ jobs:
           sudo cmake .
           sudo make
           sudo cp lib/*.a /usr/lib
-
+          
       - name: Download build-wrapper
         run: |
-          curl -sSLo bw.zip https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
-          unzip bw.zip
+          curl -sSLo build-wrapper-linux-x86.zip https://sonarcloud.io/static/cpp/build-wrapper-linux-x86.zip
+          unzip build-wrapper-linux-x86.zip
 
-      - name: Run build with build-wrapper
-        working-directory: source-code
+      - name: Build inside build-wrapper
         run: |
-          mkdir -p ../build-wrapper-output
-          ../build-wrapper-linux-x86/build-wrapper-linux-x86-64 \
-            --out-dir ../build-wrapper-output \
-            cmake -S. -Bbuild && cmake --build build
+          mkdir build
+          cd build
+          cmake ..
+          ../build-wrapper-linux-x86/build-wrapper-linux-x86-64 --out-dir ../bw-output make
 
       - name: Check build-wrapper output
         run: |
@@ -77,14 +76,10 @@ jobs:
 #          echo "sonar.sources=." >> sonar-project.properties
 #          echo "sonar.cfamily.compile-commands=build-wrapper-output/compile_commands.json" >> sonar-project.properties
       
-      - name: Run SonarCloud Scan
+      - name: Run SonarCloud analysis
         uses: SonarSource/sonarcloud-github-action@v2
         with:
-          projectBaseDir: .
-          args: >
-            -Dsonar.projectKey=yoona96_Dev-Sample-Repo
-            -Dsonar.organization=yoona96
-            -Dsonar.sources=source-code/src, source-code/include
-            -Dsonar.cfamily.build-wrapper-output=build-wrapper-output
+          organization: ${{ secrets.SONAR_ORG }}
+          projectKey: ${{ secrets.SONAR_PROJECT_KEY }}
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
