@@ -65,7 +65,6 @@ jobs:
                 --xml-pretty --xml-version=1 \
                 -o coverage/coverage.xml
 
-
       - name: Show coverage report summary
         run: |
           echo "📈 coverage.xml 생성 결과:"
