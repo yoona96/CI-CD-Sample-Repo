@@ -66,6 +66,13 @@ jobs:
           which gcovr
           gcovr --version
 
+      - name: Reinstall clean gcovr
+        run: |
+          pip uninstall -y gcovr
+          rm -rf ~/.cache/pip
+          pip install gcovr==8.3
+          ~/.local/bin/gcovr --version
+
       - name: Generate coverage report (gcovr)
         run: |
           mkdir -p coverage
