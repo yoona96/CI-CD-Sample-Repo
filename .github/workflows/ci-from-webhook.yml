@@ -28,7 +28,8 @@ jobs:
       - name: Set up dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential cmake cppcheck clang-tidy libgtest-dev gcovr
+          sudo apt-get install -y build-essential cmake cppcheck clang-tidy libgtest-dev gcovr jq
+          sudo snap install gh --classic
 
       - name: Install Google Test
         run: |
@@ -58,16 +59,23 @@ jobs:
           echo "📁 bw-output 디렉토리 확인"
           find bw-output -type f || echo "bw-output 디렉토리 없음"
 
+
       - name: Run cppcheck
         run: |
-          echo "🔍 cppcheck 실행 중"
-          cppcheck source-code --enable=all --inconclusive --quiet --std=c++17 --suppress=missingIncludeSystem
+          cppcheck --enable=all --inconclusive --std=c++17 --language=c++ \
+                   -I source-code/include \
+                   source-code/src 2> cppcheck-report.txt
+          
+      - name: Display cppcheck output
+        run: cat cppcheck-report.txt
+
 
       - name: Run clang-tidy
         run: |
           echo "🔍 clang-tidy 실행 중"
           cd source-code
           find . -name '*.cpp' | xargs clang-tidy -p build || true
+  
 
       - name: Download sonar-scanner
         run: |
@@ -81,8 +89,37 @@ jobs:
           echo "🔍 루트에 있는 설정파일 확인:"
           ls -al sonar-project.properties || echo "❌ sonar-project.properties 없음"
 
-
       - name: Run SonarCloud scanner manually
         run: |
           sonar-scanner/bin/sonar-scanner \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+
+      - name: Fetch SonarCloud issues (BLOCKER + CRITICAL)
+        run: |
+          curl -s -u ${{ secrets.SONAR_TOKEN }}: \
+            "https://sonarcloud.io/api/issues/search?projectKeys=yoona96_Dev-Sample-Repo&severities=BLOCKER,CRITICAL&resolved=false" \
+            -o sonar-issues.json
+
+      - name: Create GitHub issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          count=0
+          jq -c '.issues[]' sonar-issues.json | while read -r issue; do
+            key=$(echo "$issue" | jq -r '.key')
+            severity=$(echo "$issue" | jq -r '.severity')
+            type=$(echo "$issue" | jq -r '.type')
+            message=$(echo "$issue" | jq -r '.message')
+            file=$(echo "$issue" | jq -r '.component' | sed 's/.*src\///')
+            line=$(echo "$issue" | jq -r '.line // "?"')
+            title="[SonarCloud][${severity}] $message"
+            body="**파일**: \`$file\`\n**라인**: $line\n**유형**: $type\n\nSonarCloud Issue Key: \`$key\`"
+
+            # 중복 방지를 위해 제목에 키워드 포함 여부 확인
+            existing=$(gh issue list --search "$key" --limit 1 --json title | jq length)
+            if [[ "$existing" -eq 0 ]]; then
+              gh issue create --title "$title" --body "$body"
+              count=$((count + 1))
+            fi
+          done
+          echo "총 생성된 이슈 수: $count"
