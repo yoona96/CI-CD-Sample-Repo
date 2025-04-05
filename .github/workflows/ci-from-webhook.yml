@@ -61,9 +61,9 @@ jobs:
       - name: Generate coverage report (gcovr)
         run: |
           mkdir -p coverage
-          ~/.local/bin/gcovr -r source-code \
+          gcovr -r source-code \
                 --exclude source-code/test \
-                --xml-pretty \
+                --cobertura-pretty \
                 -o coverage/coverage.xml
 
       - name: Show coverage report summary
