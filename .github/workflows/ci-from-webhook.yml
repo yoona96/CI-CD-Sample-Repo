@@ -132,7 +132,9 @@ jobs:
         run: |
           sonar-scanner/bin/sonar-scanner \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.coverageReportPaths=coverage/coverage.xml
+            -Dsonar.coverageReportPaths=coverage/coverage.xml \
+            -Dsonar.scm.provider=git \
+            -Dsonar.cfamily.compile-commands=build/compile_commands.json
             
       - name: Fetch SonarCloud issues (all types)
         run: |
