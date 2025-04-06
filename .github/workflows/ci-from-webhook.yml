@@ -70,6 +70,13 @@ jobs:
         run: |
           echo "📈 coverage.xml 생성 결과:"
           head -n 20 coverage/coverage.xml || echo "❌ coverage.xml 없음"
+
+      - name: 🔎 커버리지 디버깅: .gc* 파일 목록
+        run: find build -name "*.gc*" || echo "❌ gcov 관련 파일 없음"
+      
+      - name: 📄 테스트 실행 로그 확인
+        run: cat build/Testing/Temporary/LastTest.log || echo "❌ 테스트 로그 없음"
+        
       
       - name: Debug build artifacts and build-wrapper output
         run: |
